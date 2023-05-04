@@ -311,6 +311,11 @@ def parse_args(options)
             options[:file] = x
         end
 
+        options[:dump_element] = nil
+        opts.on('-D', '--dump ELEMENT...', 'Dump desired element on output (ex. foo=>bar=>ish is foo.bar.ish).') do |x|
+            options[:dump_element] = x
+        end
+
         options[:element_string] = []
         opts.on('-e', '--element ELEMENT...', 'Desired element (ex. foo=>bar=>ish is foo.bar.ish). Repeatable argument.') do |x|
             options[:element_string].push x
@@ -597,6 +602,11 @@ options[:element].each do |element|
 
         # check next element on match
         next if string_match
+
+		# Replace output with dump_element if requested
+		if options[:dump_element] and json.has_key? options[:dump_element]
+			msg = json[options[:dump_element]]
+		end
 
         # do not check for warn or crit string, assume its critical
         Nagios.critical = msg unless options[:result_string_warn] && options[:result_string_crit]
